@@ -55,7 +55,7 @@ namespace gdcm
 
   */
 
-  std::ostream& DataElement::WriteXML(std::ostream &os)
+  void DataElement::WriteXML(std::ostream &os)
   {
 
      

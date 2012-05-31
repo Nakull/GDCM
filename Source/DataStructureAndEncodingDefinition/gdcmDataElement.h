@@ -247,7 +247,7 @@ public:
     return static_cast<const TDE*>(this)->template Write<TSwap>(os);
   }
 
-  std::ostream& WriteXML(std::ostream &os);
+  void WriteXML(std::ostream &os);
 
 protected:
   Tag TagField;

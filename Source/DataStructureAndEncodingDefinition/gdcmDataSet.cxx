@@ -106,4 +106,17 @@ const DataElement& DataSet::GetDataElement(const PrivateTag &t) const
   return GetDataElement( ComputeDataElement(t) );
 }
 
+void DataSet::WriteXML(std::ostream &os)
+{
+  DataElement temp;
+  Iterator it = DES.begin();
+  for( ; it != DES.end(); ++it)
+    {
+     temp = *it;
+     temp.WriteXML(os);      
+    }
+    
+}
+
+
 } // end namespace gdcm
