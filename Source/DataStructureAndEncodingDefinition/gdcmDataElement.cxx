@@ -156,7 +156,7 @@ namespace gdcm
     
     
      // Printing the VR -- Value Representation
-     os << " VR=\"" << refvr << "\"";
+     os << "VR=\"" << refvr << "\" ";
 
     
     
@@ -165,7 +165,7 @@ namespace gdcm
     
   // Add the keyword attribute :  
     
-  os <<"<keyword = \"";  
+  os <<"keyword = \"";  
     
     
   if( name && *name )
@@ -232,7 +232,7 @@ namespace gdcm
       VL l = bv->GetLength();
       //os << "[";
       //Print value tag IMP
-      os << "\n<value
+      //os << "\n<value
       if( bv->IsPrintable(l) )
         {
         bv->PrintASCII(os,l);
@@ -371,69 +371,27 @@ namespace gdcm
 
   
   
-  // Append the name now:
-  if( name && *name )
-    {
-    // No owner case !
-    if( t.IsPrivate() && (owner == 0 || *owner == 0 ) && !t.IsPrivateCreator() )
-      {
-      
-      os << " " << name;
-      
-      }
-    // retired element
-    else if( retired )
-      {
-      assert( t.IsPublic() || t.GetElement() == 0x0 ); // Is there such thing as private and retired element ?
-      
-      os << name;
-      
-      }
-    else
-      {
-      
-      os << " " << name;
-      
-      }
-    }
-  else
-    {
     
-    if( t.IsPublic() )
-      {
-      // What ? A public element that we do not know about !!!
-      
-      }
-    os << " GDCM:UNKNOWN"; // Special keyword
-    
-    }
-  
   return refvr;
 
 
  
      
 		
-     // The common name of the tag for each dicom attribute
-     os << "<DicomAttribute ";
-
-     // Printing the tag information for this XML node
-     os << " tag=\"" << TagField << "\"";
-
-     // Printing the VR -- Value Representation
-     os << " VR=\"" << VRField << "\"";
-
+     
+     
+     
      /* Printing the keyword after lookup from dictionary
         Checks whether it is from public dictionary or private
      os << " keyword=\"" << GetKeywordFromTag(TagField) << "\"";
-     */ 
+     
      
      
      
      /*Add attributes for private creator, value --after checks to handle pixel data and SQ*/	
-
+      
     
-     os << "DicomAttribute ";//end tag
+     
   }
 
 #if !defined(GDCM_LEGACY_REMOVE)
