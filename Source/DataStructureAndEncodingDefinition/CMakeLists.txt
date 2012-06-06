@@ -40,7 +40,7 @@ SET(DSED_SRCS
 INCLUDE_DIRECTORIES(
   # Bin:
   "${GDCM_BINARY_DIR}/Source/Common"
-
+  
   # src:
   "${GDCM_SOURCE_DIR}/Source/Common"
   "${GDCM_SOURCE_DIR}/Source/DataDictionary"
@@ -57,7 +57,7 @@ ENDIF(NOT GDCM_USE_SYSTEM_ZLIB)
 
 
 ADD_LIBRARY(gdcmDSED ${DSED_SRCS})
-TARGET_LINK_LIBRARIES(gdcmDSED gdcmCommon)
+TARGET_LINK_LIBRARIES(gdcmDSED gdcmCommon gdcmDICT)
 # zlib stuff are actually included (template) so we need to link them here.
 TARGET_LINK_LIBRARIES(gdcmDSED ${GDCM_ZLIB_LIBRARIES})
 SET_TARGET_PROPERTIES(gdcmDSED PROPERTIES ${GDCM_LIBRARY_PROPERTIES} LINK_INTERFACE_LIBRARIES "gdcmCommon")
