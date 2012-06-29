@@ -40,7 +40,7 @@ SET(DSED_SRCS
 INCLUDE_DIRECTORIES(
   # Bin:
   "${GDCM_BINARY_DIR}/Source/Common"
-  
+
   # src:
   "${GDCM_SOURCE_DIR}/Source/Common"
   "${GDCM_SOURCE_DIR}/Source/DataDictionary"
