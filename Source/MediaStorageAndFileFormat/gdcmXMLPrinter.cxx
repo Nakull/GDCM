@@ -408,7 +408,7 @@ void XMLPrinter::PrintSQ(const SequenceOfItems *sqi, std::ostream & os)
       }
     os << ">\n";
     */
-    os << "<Item number = \"" << noItems << "\">\n"; 
+    os << "<Item number = \"" << noItems++ << "\">\n"; 
     PrintDataSet(ds, os);
     /*
     if( deitem.GetVL().IsUndefined() )
