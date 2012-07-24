@@ -370,6 +370,8 @@ int main (int argc, char *argv[])
      * this is to debug memory for regression tests
      */
     xmlMemoryDump();
+#else
+		printf("\nPlease configure Cmake options with GDCM_USE_SYSTEM_LIBXML2 as ON and compile!\n");    
 #endif
     }
 }
