@@ -17,6 +17,7 @@
 #include "gdcmVersion.h"
 #include "gdcmFileMetaInformation.h"
 #include "gdcmDataSet.h"
+#include "gdcmDataElement.h"
 #include "gdcmPrivateTag.h"
 #include "gdcmValidate.h"
 #include "gdcmWriter.h"
@@ -85,26 +86,30 @@ void PrintHelp()
 }
 
 #ifdef GDCM_USE_SYSTEM_LIBXML2
-static void processNode(xmlTextReaderPtr reader) 
+void CreateDataElement(xmlTextReaderPtr reader, DataElement *de) 
 {
-  const xmlChar *name, *value;
+  const xmlChar *name, *vr, *keyword, *tag, *privateowner, *value;
   name = xmlTextReaderConstName(reader);
-
+  
+  vr = xmlTextReaderGetAttribute(reader,(const unsigned char*)"vr");
+  tag = xmlTextReaderGetAttribute(reader,(const unsigned char*)"tag");
+  //vr = xmlTextReaderGetAttribute(reader,"privateowner");
+  //printf("hey 1) %s %s \n", vr, tag);
   if (name == NULL)
     name = BAD_CAST "--";
 
-  value = xmlTextReaderConstValue(reader);
-  printf("%d %d %s %d %d", 
-      xmlTextReaderDepth(reader),
-      xmlTextReaderNodeType(reader),
-      name,
-      xmlTextReaderIsEmptyElement(reader),
-      xmlTextReaderHasValue(reader));
+  //value = xmlTextReaderConstValue(reader);
+  //printf("heyp %d %d %s %d %d", 
+    //  xmlTextReaderDepth(reader),
+      //xmlTextReaderNodeType(reader),
+      //name,
+      //xmlTextReaderIsEmptyElement(reader),
+      //xmlTextReaderHasValue(reader));
       
-  if(value == NULL)
-    printf("\n");
+  //if(value == NULL)
+    //printf("\n");
   else 
-    {
+    {a
     if (xmlStrlen(value) > 40)
       printf(" %.40s...\n", value);
     else
@@ -112,18 +117,21 @@ static void processNode(xmlTextReaderPtr reader)
     }
 }
 
-static void WriteDataSet(xmlTextReaderPtr reader, gdcm::Filename file2)
+DataSet &PopulateDataSet(xmlTextReaderPtr reader)
 {
   DataSet DS;
   DataElement de;
-  File F;
-  Writer W;
-  
-  //populate DS
-  int ret = xmlTextReaderRead(reader);
+	int ret = xmlTextReaderRead(reader);
   while (ret == 1) 
     {
-    processNode(reader);
+    //create Data Element with attributes
+    
+    CreateDataElement(reader,&de);
+    //put value - Handle SQ, UN, fragments etc.
+    
+    //Insert Into DataSet
+    
+    //Continue traversing
     ret = xmlTextReaderRead(reader);
     }
   xmlFreeTextReader(reader);
@@ -133,16 +141,27 @@ static void WriteDataSet(xmlTextReaderPtr reader, gdcm::Filename file2)
     exit(1);
     }
   
-  //add to File  
+  return DS;  
+}
+
+static void WriteDICOM(xmlTextReaderPtr reader, gdcm::Filename file2)
+{
+	//populate DS
+  DataSet &DS = PopulateDataSet(reader);
+  
+  //add to File 
+  File F;
   F.SetDataSet(DS);
   
   //add to Writer
+  Writer W;
   W.SetFile(F);  
   W.CheckFileMetaInformationOff();
   W.SetFileName(file2.GetFileName());
   
   //finally write to file
-  W.Write();    
+  W.Write(); 
+  
 }
 
 static void XMLtoDICOM(gdcm::Filename file1, gdcm::Filename file2)
@@ -170,7 +189,7 @@ static void XMLtoDICOM(gdcm::Filename file1, gdcm::Filename file2)
   //reader = xmlReaderForFile(filename, "UTF-8", 0);
   if (reader != NULL) 
     {
-    WriteDataSet(reader, file2);
+    WriteDICOM(reader, file2);
     } 
   else 
     {
