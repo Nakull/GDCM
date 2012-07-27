@@ -93,7 +93,7 @@ void PopulateDataSet(xmlTextReaderPtr reader,const DataSet &DS)
    int ret = xmlTextReaderRead(reader);/**/
    ret = xmlTextReaderRead(reader); /* moving past tag <NativeDicomModel> */
    const char *name = (const char*)xmlTextReaderConstName(reader);
-   const char *tag_read;
+      
    while(strcmp(name,"NativeDicomModel") != 0)
 		{
    	if(strcmp(name,"DicomAttribute") == 0)
@@ -101,11 +101,18 @@ void PopulateDataSet(xmlTextReaderPtr reader,const DataSet &DS)
 			DataElement de;
 			
 			/* Reading Tag */
-			tag_read =(const char *)xmlTextReaderGetAttribute(reader,(const unsigned char*)"tag");
+			const char *tag_read =(const char *)xmlTextReaderGetAttribute(reader,(const unsigned char*)"tag");
   		Tag t;
   		if(!t.ReadFromContinuousString((const char *)tag_read))
   			assert(0 && "Invalid Tag!");
 		  
+		  /* Reading VR */
+		  char vr_read[3] = "";
+		  strcpy(vr_read, (const char *)xmlTextReaderGetAttribute(reader,(const unsigned char*)"vr"));
+		  vr_read[2]='\0';
+  		const gdcm::VR vr = gdcm::VR::GetVRType(vr_read);	
+		  
+		  /*Read Next DataElement*/
 		  ret = xmlTextReaderRead(reader);	
 			name = (const char*)xmlTextReaderConstName(reader);
 			}
