@@ -98,17 +98,32 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
 
 #define LoadValue(type) \
   case type: \
-    { \
-      int count =0; \
-      	Element<type,VM::VM1_n> el; \
-    	while(strcmp(name,"Value") == 0) \
     		{ \
-    		el.SetValue((typename VRToType<VR::CS>::Type)((const char*)xmlTextReaderConstValue(reader)),count++); \
-    		ret = xmlTextReaderRead(reader); \
-    		ret = xmlTextReaderRead(reader); \
-    		} \
+      	int count =0; \
+      	ret = xmlTextReaderRead(reader); \
+      	ret = xmlTextReaderRead(reader); \
+      	name = (const char*)xmlTextReaderConstName(reader); \
+      	char values[10][100] = {"","","","","","","","","",""}; \
+      	Element<type,VM::VM1_n> el; \
+    		while(strcmp(name,"Value") == 0) \
+    			{ \
+    			ret = xmlTextReaderRead(reader); \
+    			char *value = (char*)xmlTextReaderConstValue(reader); \
+    			strcpy((char *)values[count++],value); \
+    			ret = xmlTextReaderRead(reader); \
+    			name = (const char*)xmlTextReaderConstName(reader); \
+    			ret = xmlTextReaderRead(reader); \
+    			name = (const char*)xmlTextReaderConstName(reader); \
+    			} \
+    		el.SetLength( (count) * vr.GetSizeof() ); \
+    		int total = 0; \
+    		while(total < count) \
+    			{ \
+    			el.SetValue(/*(typename VRToType<VR::CS>::Type)*/values[total],total); \
+    			total++; \
+    			} \
     		de = el.GetAsDataElement(); \
-    }break \
+    		}break
           
    while(strcmp(name,"NativeDicomModel") != 0)
 		{
@@ -130,7 +145,7 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
 		  
 		  /* Load Value */
 		  switch(vr)
-		  	{/*
+		  	{
 		  	LoadValue(VR::AE);
 		  	LoadValue(VR::AS);
 				LoadValue(VR::CS);
@@ -145,7 +160,7 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
 				LoadValue(VR::ST);
 				LoadValue(VR::TM);
 				LoadValue(VR::UI);
-				LoadValue(VR::UT);*/
+				LoadValue(VR::UT);/*
 		  	case VR::CS: 
     		{ 
       	int count =0;
@@ -159,7 +174,7 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
     			ret = xmlTextReaderRead(reader);
     			char *value = (char*)xmlTextReaderConstValue(reader);
     			//el.SetLength( (count + 1) * vr.GetSizeof() );
-    			//el.SetValue(/*(typename VRToType<VR::CS>::Type)*/value,count++); 
+    			//el.SetValue(/value,count++); 
     			strcpy((char *)values[count++],value);
     			ret = xmlTextReaderRead(reader); 
     			name = (const char*)xmlTextReaderConstName(reader);
@@ -170,11 +185,11 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
     		int total = 0;
     		while(total < count)
     			{
-    			el.SetValue(/*(typename VRToType<VR::CS>::Type)*/values[total],total); 
+    			el.SetValue(values[total],total); 
     			total++;
     			}
     		de = el.GetAsDataElement();	
-    		}break;
+    		}break;*/
 		  	}
 		  
 		  /*Modify de to insert*/
