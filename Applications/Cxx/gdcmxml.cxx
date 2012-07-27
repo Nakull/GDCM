@@ -96,13 +96,13 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
 
 
 #define LoadValue(type) \
-  case VR::type: \
+  case type: \
     { \
       int count =0; \
-      	Element<VR::type,VM::VM1_n> el; \
+      	Element<type,VM::VM1_n> el; \
     	while(strcmp(name,"Value") == 0) \
     		{ \
-    		SetValue((typename VRToType<type>::Type)xmlTextReaderConstValue(reader),count++); \
+    		el.SetValue((typename VRToType<VR::CS>::Type)((const char*)xmlTextReaderConstValue(reader)),count++); \
     		ret = xmlTextReaderRead(reader); \
     		ret = xmlTextReaderRead(reader); \
     		} \
@@ -125,6 +125,23 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
 		  strcpy(vr_read, (const char *)xmlTextReaderGetAttribute(reader,(const unsigned char*)"vr"));
 		  vr_read[2]='\0';
   		const gdcm::VR vr = gdcm::VR::GetVRType(vr_read);	
+		  
+		  /* Load Value */
+		  switch(vr)
+		  	{
+		  	LoadValue(VR::CS);
+		  	/*case VR::CS: 
+    		{ 
+      	int count =0; 
+      	Element<VR::CS,VM::VM1_n> el; 
+    		while(strcmp(name,"Value") == 0) 
+    			{ 
+    			el.SetValue((typename VRToType<VR::CS>::Type)((const char*)xmlTextReaderConstValue(reader)),count++); 
+    			ret = xmlTextReaderRead(reader); 
+    			ret = xmlTextReaderRead(reader);
+    			} 
+    		}break;*/
+		  	}
 		  
 		  /*Modify de to insert*/
 		  de.SetTag(t);
