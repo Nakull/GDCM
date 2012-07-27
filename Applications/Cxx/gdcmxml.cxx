@@ -93,7 +93,21 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
    int ret = xmlTextReaderRead(reader);/**/
    ret = xmlTextReaderRead(reader); /* moving past tag <NativeDicomModel> */
    const char *name = (const char*)xmlTextReaderConstName(reader);
-      
+
+
+#define LoadValue(type) \
+  case VR::type: \
+    { \
+      int count =0; \
+      	Element<VR::type,VM::VM1_n> el; \
+    	while(strcmp(name,"Value") == 0) \
+    		{ \
+    		SetValue((typename VRToType<type>::Type)xmlTextReaderConstValue(reader),count++); \
+    		ret = xmlTextReaderRead(reader); \
+    		ret = xmlTextReaderRead(reader); \
+    		} \
+    }break \
+          
    while(strcmp(name,"NativeDicomModel") != 0)
 		{
    	if(strcmp(name,"DicomAttribute") == 0)
