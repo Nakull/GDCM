@@ -30,6 +30,7 @@
 #include "gdcmASN1.h"
 #include "gdcmFile.h"
 #include "gdcmXMLPrinter.h"
+#include "gdcmPrinter.h"
 
 #ifdef GDCM_USE_SYSTEM_LIBXML2
 #include <libxml/xmlreader.h>
@@ -106,6 +107,7 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
     		ret = xmlTextReaderRead(reader); \
     		ret = xmlTextReaderRead(reader); \
     		} \
+    		de = el.GetAsDataElement(); \
     }break \
           
    while(strcmp(name,"NativeDicomModel") != 0)
@@ -128,14 +130,14 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
 		  
 		  /* Load Value */
 		  switch(vr)
-		  	{
+		  	{/*
 		  	LoadValue(VR::AE);
 		  	LoadValue(VR::AS);
 				LoadValue(VR::CS);
 				LoadValue(VR::DA);
-				//LoadValue(VR::DS);
+				//LoadValue(VR::DS); Check whats wrong
 				LoadValue(VR::DT);
-				//LoadValue(VR::IS);
+				//LoadValue(VR::IS); Check whats wrong
 				LoadValue(VR::LO);
 				LoadValue(VR::LT);
 				//LoadValue(VR::PN); TO DO
@@ -143,32 +145,45 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
 				LoadValue(VR::ST);
 				LoadValue(VR::TM);
 				LoadValue(VR::UI);
-				LoadValue(VR::UT);
-		  	/*case VR::CS: 
+				LoadValue(VR::UT);*/
+		  	case VR::CS: 
     		{ 
-      	int count =0; 
+      	int count =0;
+      	ret = xmlTextReaderRead(reader);
+      	ret = xmlTextReaderRead(reader);
+      	name = (const char*)xmlTextReaderConstName(reader); 
       	Element<VR::CS,VM::VM1_n> el; 
     		while(strcmp(name,"Value") == 0) 
     			{ 
-    			el.SetValue((typename VRToType<VR::CS>::Type)((const char*)xmlTextReaderConstValue(reader)),count++); 
-    			ret = xmlTextReaderRead(reader); 
     			ret = xmlTextReaderRead(reader);
+    			const char * value = (const char*)xmlTextReaderConstValue(reader);
+    			el.SetLength( (count + 1) * vr.GetSizeof() );
+    			el.SetValue(/*(typename VRToType<VR::CS>::Type)*/value,count++); 
+    			ret = xmlTextReaderRead(reader); 
+    			name = (const char*)xmlTextReaderConstName(reader);
+    			ret = xmlTextReaderRead(reader);
+    			name = (const char*)xmlTextReaderConstName(reader);
     			} 
-    		}break;*/
+    		de = el.GetAsDataElement();	
+    		}break;
 		  	}
 		  
 		  /*Modify de to insert*/
+		  
 		  de.SetTag(t);
-		  de.SetVR(vr);
+		  
 		  
 		  DS.Insert(de);
 		  
 		  /*Read Next DataElement*/
+		  ret = xmlTextReaderRead(reader);
+		  ret = xmlTextReaderRead(reader);
 		  ret = xmlTextReaderRead(reader);	
 			name = (const char*)xmlTextReaderConstName(reader);
 			}
 		ret = xmlTextReaderRead(reader);	
-		name = (const char*)xmlTextReaderConstName(reader);	   	
+		name = (const char*)xmlTextReaderConstName(reader);
+			   	
    	}
 }
 
@@ -184,6 +199,11 @@ void WriteDICOM(xmlTextReaderPtr reader, gdcm::Filename file2)
   
   //Validate - possibly from gdcmValidate Class
   
+  
+  Printer printer;
+  printer.SetFile ( F );
+  //printer.SetColor( color != 0);
+  printer.Print( std::cout );
   //add to Writer
   Writer W;
   W.SetFile(F);  
