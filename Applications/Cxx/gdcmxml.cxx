@@ -87,104 +87,39 @@ void PrintHelp()
 }
 
 #ifdef GDCM_USE_SYSTEM_LIBXML2
-static void CreateDataElement(xmlTextReaderPtr reader,const DataElement &de) 
+
+void PopulateDataSet(xmlTextReaderPtr reader,const DataSet &DS)
 {
-  const char *name, *vr_read, *keyword, *tag_read, *privateowner, *value;
-  name = (const char*)xmlTextReaderConstName(reader);
-  if (strcmp(name,"DicomAttribute") == 0)
-  {
-  vr_read = (const char *)xmlTextReaderGetAttribute(reader,(const unsigned char*)"vr");
-  tag_read =(const char *)xmlTextReaderGetAttribute(reader,(const unsigned char*)"tag");
-  Tag t;
-  if(!t.ReadFromContinuousString((const char *)tag_read))
-  	assert(0 && "Invalid Tag!");
-  	
-  std::cout << t; 
-  //printf("hey\n");
-  //vr = xmlTextReaderGetAttribute(reader,"privateowner");
-  //printf("hey 1) %s %s \n", vr_read, tag_read);
-  if (name == NULL)
-    name = BAD_CAST "--";
-  /*
-  value = xmlTextReaderConstValue(reader);
-  printf("heyp %d %d %s %d %d", 
-    xmlTextReaderDepth(reader),
-    xmlTextReaderNodeType(reader),
-    name,
-    xmlTextReaderIsEmptyElement(reader),
-    xmlTextReaderHasValue(reader));
-      
-  if(value == NULL)
-    printf("\n");
-  else 
-    {
-    if (xmlStrlen(value) > 40)
-      printf(" %.40s...\n", value);
-    else
-      printf(" %s\n", value);
-    }*/
-   } 
-}
-static void readASCIIValue(xmlTextReaderPtr reader, Attribute &at)
-{
-	int ret = xmlTextReaderRead(reader);
-	const char *name, *value;
-	int number, count=1;
-  name = (const char*)xmlTextReaderConstName(reader);
-  VRToType<at.GetVR()>::Type Values[at.GetNumberOfValues()]
-	while(strcmp(name,"DicomAttribute") != 0  && ret == 1)
+   int ret = xmlTextReaderRead(reader);/**/
+   ret = xmlTextReaderRead(reader); /* moving past tag <NativeDicomModel> */
+   const char *name = (const char*)xmlTextReaderConstName(reader);
+   const char *tag_read;
+   while(strcmp(name,"NativeDicomModel") != 0)
 		{
-		if (strcmp(name,"Value") == 0)
+   	if(strcmp(name,"DicomAttribute") == 0)
 			{
-			value =(const char*) xmlTextReaderConstValue(reader);
-			number = atoi( (const char *)xmlTextReaderGetAttribute(reader,(const unsigned char*)"number"));
-			if(number != count)
-				//XML error --- invalid serial Debug Macro
-				
+			DataElement de;
+			
+			/* Reading Tag */
+			tag_read =(const char *)xmlTextReaderGetAttribute(reader,(const unsigned char*)"tag");
+  		Tag t;
+  		if(!t.ReadFromContinuousString((const char *)tag_read))
+  			assert(0 && "Invalid Tag!");
+		  
+		  ret = xmlTextReaderRead(reader);	
+			name = (const char*)xmlTextReaderConstName(reader);
 			}
-		}
-	if(ret !=1)
-	 assert("Unexpected end of file");		
-}
-static void PopulateDataSet(xmlTextReaderPtr reader,const DataSet &DS)
-{
-  //const DataSet *ds;
-  const DataElement de;
-	int ret = xmlTextReaderRead(reader);
-	//ret = xmlTextReaderRead(reader);//move past starting tag
-  while (ret == 1) 
-    {
-    //create Data Element with attributes
-    
-    CreateDataElement(reader,de);
-    
-    Attribute<de.getTag().getGroup(),<de.getTag().getGroup()> at;
-    
-    //put value - Handle SQ, UN, fragments etc.
-    if(at.GetVR() == VR::VRASCII)
-    	readASCIIValue(&at);    
-    
-    //Insert Into DataSet
-    DS.Insert(at.GetAsDataElement());
-    
-    //Continue traversing
-    ret = xmlTextReaderRead(reader);
-    }
-  xmlFreeTextReader(reader);
-  if (ret != 0) 
-    {
-    fprintf(stderr, "Failed to parse XML file\n");
-    exit(1);
-    }
-  
-  //return ds;  
+		ret = xmlTextReaderRead(reader);	
+		name = (const char*)xmlTextReaderConstName(reader);	   	
+   	}
 }
 
-static void WriteDICOM(xmlTextReaderPtr reader, gdcm::Filename file2)
+void WriteDICOM(xmlTextReaderPtr reader, gdcm::Filename file2)
 {
 	//populate DS
   const DataSet DS;
   PopulateDataSet(reader,DS);
+  
   //add to File 
   File F;
   F.SetDataSet(DS);
@@ -198,7 +133,7 @@ static void WriteDICOM(xmlTextReaderPtr reader, gdcm::Filename file2)
   W.SetFileName(file2.GetFileName());
   
   //finally write to file
-  //W.Write(); 
+  W.Write(); 
   
 }
 
