@@ -88,7 +88,7 @@ void PrintHelp()
 
 #ifdef GDCM_USE_SYSTEM_LIBXML2
 
-void PopulateDataSet(xmlTextReaderPtr reader,const DataSet &DS)
+void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
 {
    int ret = xmlTextReaderRead(reader);/**/
    ret = xmlTextReaderRead(reader); /* moving past tag <NativeDicomModel> */
@@ -101,7 +101,7 @@ void PopulateDataSet(xmlTextReaderPtr reader,const DataSet &DS)
 			DataElement de;
 			
 			/* Reading Tag */
-			const char *tag_read =(const char *)xmlTextReaderGetAttribute(reader,(const unsigned char*)"tag");
+			char *tag_read =(char *)xmlTextReaderGetAttribute(reader,(const unsigned char*)"tag");
   		Tag t;
   		if(!t.ReadFromContinuousString((const char *)tag_read))
   			assert(0 && "Invalid Tag!");
@@ -111,6 +111,12 @@ void PopulateDataSet(xmlTextReaderPtr reader,const DataSet &DS)
 		  strcpy(vr_read, (const char *)xmlTextReaderGetAttribute(reader,(const unsigned char*)"vr"));
 		  vr_read[2]='\0';
   		const gdcm::VR vr = gdcm::VR::GetVRType(vr_read);	
+		  
+		  /*Modify de to insert*/
+		  de.SetTag(t);
+		  de.SetVR(vr);
+		  
+		  DS.Insert(de);
 		  
 		  /*Read Next DataElement*/
 		  ret = xmlTextReaderRead(reader);	
@@ -124,7 +130,7 @@ void PopulateDataSet(xmlTextReaderPtr reader,const DataSet &DS)
 void WriteDICOM(xmlTextReaderPtr reader, gdcm::Filename file2)
 {
 	//populate DS
-  const DataSet DS;
+  DataSet DS;
   PopulateDataSet(reader,DS);
   
   //add to File 
