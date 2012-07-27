@@ -129,7 +129,21 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
 		  /* Load Value */
 		  switch(vr)
 		  	{
-		  	LoadValue(VR::CS);
+		  	LoadValue(VR::AE);
+		  	LoadValue(VR::AS);
+				LoadValue(VR::CS);
+				LoadValue(VR::DA);
+				//LoadValue(VR::DS);
+				LoadValue(VR::DT);
+				//LoadValue(VR::IS);
+				LoadValue(VR::LO);
+				LoadValue(VR::LT);
+				//LoadValue(VR::PN); TO DO
+				LoadValue(VR::SH);
+				LoadValue(VR::ST);
+				LoadValue(VR::TM);
+				LoadValue(VR::UI);
+				LoadValue(VR::UT);
 		  	/*case VR::CS: 
     		{ 
       	int count =0; 
