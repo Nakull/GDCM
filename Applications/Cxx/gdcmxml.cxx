@@ -89,19 +89,20 @@ void PrintHelp()
 #ifdef GDCM_USE_SYSTEM_LIBXML2
 static void CreateDataElement(xmlTextReaderPtr reader,const DataElement &de) 
 {
-  const xmlChar *name, *vr_read, *keyword, *tag_read, *privateowner, *value;
-  name = xmlTextReaderConstName(reader);
-  if (strcmp((const char*)name,"DicomAttribute") == 0)
+  const char *name, *vr_read, *keyword, *tag_read, *privateowner, *value;
+  name = (const char*)xmlTextReaderConstName(reader);
+  if (strcmp(name,"DicomAttribute") == 0)
   {
-  vr_read = xmlTextReaderGetAttribute(reader,(const unsigned char*)"vr");
-  tag_read = xmlTextReaderGetAttribute(reader,(const unsigned char*)"tag");
+  vr_read = (const char *)xmlTextReaderGetAttribute(reader,(const unsigned char*)"vr");
+  tag_read =(const char *)xmlTextReaderGetAttribute(reader,(const unsigned char*)"tag");
   Tag t;
   if(!t.ReadFromContinuousString((const char *)tag_read))
   	assert(0 && "Invalid Tag!");
+  	
   std::cout << t; 
-  printf("hey\n");
+  //printf("hey\n");
   //vr = xmlTextReaderGetAttribute(reader,"privateowner");
-  printf("hey 1) %s %s \n", vr_read, tag_read);
+  //printf("hey 1) %s %s \n", vr_read, tag_read);
   if (name == NULL)
     name = BAD_CAST "--";
   /*
@@ -124,7 +125,27 @@ static void CreateDataElement(xmlTextReaderPtr reader,const DataElement &de)
     }*/
    } 
 }
-
+static void readASCIIValue(xmlTextReaderPtr reader, Attribute &at)
+{
+	int ret = xmlTextReaderRead(reader);
+	const char *name, *value;
+	int number, count=1;
+  name = (const char*)xmlTextReaderConstName(reader);
+  VRToType<at.GetVR()>::Type Values[at.GetNumberOfValues()]
+	while(strcmp(name,"DicomAttribute") != 0  && ret == 1)
+		{
+		if (strcmp(name,"Value") == 0)
+			{
+			value =(const char*) xmlTextReaderConstValue(reader);
+			number = atoi( (const char *)xmlTextReaderGetAttribute(reader,(const unsigned char*)"number"));
+			if(number != count)
+				//XML error --- invalid serial Debug Macro
+				
+			}
+		}
+	if(ret !=1)
+	 assert("Unexpected end of file");		
+}
 static void PopulateDataSet(xmlTextReaderPtr reader,const DataSet &DS)
 {
   //const DataSet *ds;
@@ -136,9 +157,15 @@ static void PopulateDataSet(xmlTextReaderPtr reader,const DataSet &DS)
     //create Data Element with attributes
     
     CreateDataElement(reader,de);
+    
+    Attribute<de.getTag().getGroup(),<de.getTag().getGroup()> at;
+    
     //put value - Handle SQ, UN, fragments etc.
+    if(at.GetVR() == VR::VRASCII)
+    	readASCIIValue(&at);    
     
     //Insert Into DataSet
+    DS.Insert(at.GetAsDataElement());
     
     //Continue traversing
     ret = xmlTextReaderRead(reader);
@@ -159,16 +186,16 @@ static void WriteDICOM(xmlTextReaderPtr reader, gdcm::Filename file2)
   const DataSet DS;
   PopulateDataSet(reader,DS);
   //add to File 
-  //File F;
-  //F.SetDataSet(DS);
+  File F;
+  F.SetDataSet(DS);
   
   //Validate - possibly from gdcmValidate Class
   
   //add to Writer
   Writer W;
-  //W.SetFile(F);  
-  //W.CheckFileMetaInformationOff();
-  //W.SetFileName(file2.GetFileName());
+  W.SetFile(F);  
+  W.CheckFileMetaInformationOff();
+  W.SetFileName(file2.GetFileName());
   
   //finally write to file
   //W.Write(); 
