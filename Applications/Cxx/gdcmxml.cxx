@@ -151,19 +151,28 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
       	int count =0;
       	ret = xmlTextReaderRead(reader);
       	ret = xmlTextReaderRead(reader);
-      	name = (const char*)xmlTextReaderConstName(reader); 
+      	name = (const char*)xmlTextReaderConstName(reader);
+      	char values[10][100] = {"","","","","","","","","",""}; 
       	Element<VR::CS,VM::VM1_n> el; 
     		while(strcmp(name,"Value") == 0) 
     			{ 
     			ret = xmlTextReaderRead(reader);
-    			const char * value = (const char*)xmlTextReaderConstValue(reader);
-    			el.SetLength( (count + 1) * vr.GetSizeof() );
-    			el.SetValue(/*(typename VRToType<VR::CS>::Type)*/value,count++); 
+    			char *value = (char*)xmlTextReaderConstValue(reader);
+    			//el.SetLength( (count + 1) * vr.GetSizeof() );
+    			//el.SetValue(/*(typename VRToType<VR::CS>::Type)*/value,count++); 
+    			strcpy((char *)values[count++],value);
     			ret = xmlTextReaderRead(reader); 
     			name = (const char*)xmlTextReaderConstName(reader);
     			ret = xmlTextReaderRead(reader);
     			name = (const char*)xmlTextReaderConstName(reader);
-    			} 
+    			}
+    		el.SetLength( (count) * vr.GetSizeof() );
+    		int total = 0;
+    		while(total < count)
+    			{
+    			el.SetValue(/*(typename VRToType<VR::CS>::Type)*/values[total],total); 
+    			total++;
+    			}
     		de = el.GetAsDataElement();	
     		}break;
 		  	}
