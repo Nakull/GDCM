@@ -244,7 +244,7 @@ namespace gdcm
         {
         count++;
         os << "</Value>\n";
-        os << "\t<Value number = \"" << count << "\" >";
+        os << "<Value number = \"" << count << "\" >";
         }
       else if ( !c )
         {
@@ -268,7 +268,7 @@ namespace gdcm
       else
         os << c;
       }
-    os << "</Value>";
+    os << "</Value>\n";
     }
 
   void ByteValue::PrintHexXML(std::ostream &os ) const
