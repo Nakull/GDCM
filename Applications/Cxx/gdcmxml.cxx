@@ -90,19 +90,20 @@ void PrintHelp()
 #ifdef GDCM_USE_SYSTEM_LIBXML2
 
 void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
-{
-   int ret = xmlTextReaderRead(reader);/**/
-   ret = xmlTextReaderRead(reader); /* moving past tag <NativeDicomModel> */
+{		
+	 int ret;	
+   //int ret = xmlTextReaderRead(reader);/**/
+   //ret = xmlTextReaderRead(reader); /* moving past tag <NativeDicomModel> */
    const char *name = (const char*)xmlTextReaderConstName(reader);
-
+	 //printf("%s\n",name);				
 
 #define LoadValue(type) \
   case type: \
     		{ \
       	int count =0; \
-      	ret = xmlTextReaderRead(reader); \
-      	ret = xmlTextReaderRead(reader); \
       	name = (const char*)xmlTextReaderConstName(reader); \
+      	if(strcmp(name,"DicomAttribute") == 0 && xmlTextReaderNodeType(reader) == 15)\
+      		break;\
       	char values[10][100] = {"","","","","","","","","",""}; \
       	Element<type,VM::VM1_n> el; \
     		while(strcmp(name,"Value") == 0) \
@@ -110,9 +111,9 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
     			ret = xmlTextReaderRead(reader); \
     			char *value = (char*)xmlTextReaderConstValue(reader); \
     			strcpy((char *)values[count++],value); \
-    			ret = xmlTextReaderRead(reader); \
+    			ret = xmlTextReaderRead(reader);/*Value ending tag*/ \
     			name = (const char*)xmlTextReaderConstName(reader); \
-    			ret = xmlTextReaderRead(reader); \
+    			ret = xmlTextReaderRead(reader);ret = xmlTextReaderRead(reader); \
     			name = (const char*)xmlTextReaderConstName(reader); \
     			} \
     		el.SetLength( (count) * vr.GetSizeof() ); \
@@ -125,7 +126,7 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
     		de = el.GetAsDataElement(); \
     		}break
           
-   while(strcmp(name,"NativeDicomModel") != 0)
+   while(xmlTextReaderDepth(reader) != 0)
 		{
    	if(strcmp(name,"DicomAttribute") == 0)
 			{
@@ -141,8 +142,11 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
 		  char vr_read[3] = "";
 		  strcpy(vr_read, (const char *)xmlTextReaderGetAttribute(reader,(const unsigned char*)"vr"));
 		  vr_read[2]='\0';
-  		const gdcm::VR vr = gdcm::VR::GetVRType(vr_read);	
-		  
+  		const gdcm::VR vr = gdcm::VR::GetVRType(vr_read);
+  		
+  		ret=xmlTextReaderRead(reader);// at 14 NodeType
+  		
+		  ret=xmlTextReaderRead(reader);// should be at value tag or BulkData tag
 		  /* Load Value */
 		  switch(vr)
 		  	{
@@ -198,15 +202,27 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
 		  
 		  
 		  DS.Insert(de);
+		  /*
+		  while(xmlTextReaderNodeType(reader) != 15)
+		  	ret = xmlTextReaderRead(reader);
 		  
+		  if(strcmp((const char*)xmlTextReaderConstName(reader),"DicomAttribute") == 0)
+		  	{
+		  	while(xmlTextReaderNodeType(reader) != 15 && strcmp((const char*)xmlTextReaderConstName(reader),"DicomAttribute") == 0)
+		  		{
+		  		if(xmlTextReaderDepth(reader) == 0)
+		  			return;
+		  		}
+		  	}
+		  else
+		  	assert("No proper end tag" && 0);		
+		  */
 		  /*Read Next DataElement*/
-		  ret = xmlTextReaderRead(reader);
-		  ret = xmlTextReaderRead(reader);
-		  ret = xmlTextReaderRead(reader);	
-			name = (const char*)xmlTextReaderConstName(reader);
+		  
+		  
 			}
-		ret = xmlTextReaderRead(reader);	
-		name = (const char*)xmlTextReaderConstName(reader);
+		//ret = xmlTextReaderRead(reader);	
+		//name = (const char*)xmlTextReaderConstName(reader);
 			   	
    	}
 }
@@ -214,8 +230,17 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
 void WriteDICOM(xmlTextReaderPtr reader, gdcm::Filename file2)
 {
 	//populate DS
-  DataSet DS;
-  PopulateDataSet(reader,DS);
+	int ret = xmlTextReaderRead(reader);
+	if(ret == -1)
+		assert(0 && "unable to read");
+	//while(xmlTextReaderDepth(reader) != 1)
+	//ret = xmlTextReaderRead(reader);
+	ret = xmlTextReaderRead(reader);
+	ret = xmlTextReaderRead(reader);// at first element
+	
+	DataSet DS;
+	if(xmlTextReaderDepth(reader) == 1 && strcmp((const char*)xmlTextReaderConstName(reader),"DicomAttribute") == 0)  
+  	PopulateDataSet(reader,DS);
   
   //add to File 
   File F;
