@@ -155,6 +155,34 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
     		de = el.GetAsDataElement(); \
     		}break
 
+#define LoadValueFloat(type) \
+  case type: \
+    		{ \
+      	int count =0; \
+      	name = (const char*)xmlTextReaderConstName(reader); \
+      	if(strcmp(name,"DicomAttribute") == 0 && xmlTextReaderNodeType(reader) == 15)\
+      		break;\
+      	float values[10]; \
+      	Element<type,VM::VM1_n> el; \
+    		while(strcmp(name,"Value") == 0) \
+    			{ \
+    			ret = xmlTextReaderRead(reader); \
+    			char *value_char = (char*)xmlTextReaderConstValue(reader); \
+    			sscanf(value_char,"%lf",&(values[count++]));  \
+    			ret = xmlTextReaderRead(reader);/*Value ending tag*/ \
+    			name = (const char*)xmlTextReaderConstName(reader); \
+    			ret = xmlTextReaderRead(reader);ret = xmlTextReaderRead(reader); \
+    			name = (const char*)xmlTextReaderConstName(reader); \
+    			} \
+    		el.SetLength( (count) * vr.GetSizeof() ); \
+    		int total = 0; \
+    		while(total < count) \
+    			{ \
+    			el.SetValue(values[total],total); \
+    			total++; \
+    			} \
+    		de = el.GetAsDataElement(); \
+    		}break
 
     		
           
