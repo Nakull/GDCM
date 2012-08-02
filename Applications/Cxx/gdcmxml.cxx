@@ -164,7 +164,9 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
 				LoadValue(VR::ST);
 				LoadValue(VR::TM);
 				LoadValue(VR::UI);
-				LoadValue(VR::UT);/*
+				LoadValue(VR::UT);
+				//LoadValue(VR::SS);
+				/*
 		  	case VR::CS: 
     		{ 
       	int count =0;
@@ -194,6 +196,39 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
     			}
     		de = el.GetAsDataElement();	
     		}break;*/
+    		case VR::UL:
+    		case VR::SL:
+    		case VR::US:
+    		{ 
+      	int count =0; 
+      	name = (const char*)xmlTextReaderConstName(reader); 
+      	if(strcmp(name,"DicomAttribute") == 0 && xmlTextReaderNodeType(reader) == 15)
+      		break;
+      	int values[10]; 
+      	Element<VR::US,VM::VM1_n> el; 
+    		while(strcmp(name,"Value") == 0) 
+    			{ 
+    			ret = xmlTextReaderRead(reader); 
+    			char *value_char = (char*)xmlTextReaderConstValue(reader); 
+    			//strcpy((char *)values[count++],value); 
+    			sscanf(value_char,"%d",&(values[count++]));    			
+    			ret = xmlTextReaderRead(reader);/*Value ending tag*/ 
+    			name = (const char*)xmlTextReaderConstName(reader); 
+    			ret = xmlTextReaderRead(reader);ret = xmlTextReaderRead(reader); 
+    			name = (const char*)xmlTextReaderConstName(reader); 
+    			} 
+    		el.SetLength( (count) * vr.GetSizeof() ); 
+    		int total = 0; 
+    		while(total < count) 
+    			{ 
+    			el.SetValue(/*(typename VRToType<VR::CS>::Type)*/values[total],total); 
+    			total++; 
+    			} 
+    		de = el.GetAsDataElement(); 
+    		}
+    		break;
+    		
+    		
 		  	}
 		  
 		  /*Modify de to insert*/
