@@ -89,10 +89,7 @@ void PrintHelp()
 
 #ifdef GDCM_USE_SYSTEM_LIBXML2
 
-void HandleSequence(xmlTextReaderPtr reader,DataSet &DS,int depth)
-	{
-	return;
-	}
+void HandleSequence(xmlTextReaderPtr reader,DataSet &DS,int depth);
 void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
 {		
 	 int ret;	
@@ -238,7 +235,7 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
   		
   		ret=xmlTextReaderRead(reader);// at 14 NodeType
   		
-		  ret=xmlTextReaderRead(reader);// should be at value tag or BulkData tag
+		  ret=xmlTextReaderRead(reader);// should be at value tag or BulkData tag or Item Tag
 		  /* Load Value */
 		  switch(vr)
 		  	{
@@ -300,6 +297,27 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
 		//name = (const char*)xmlTextReaderConstName(reader);
 			   	
    	}
+}
+
+void HandleSequence(xmlTextReaderPtr reader,DataSet &DS,int depth)
+{
+	int ret;	
+  const char *name = (const char*)xmlTextReaderConstName(reader);// Should be item
+    
+  ret = xmlTextReaderRead(reader);
+  ret = xmlTextReaderRead(reader);//at /Dicom
+  if((strcmp(name,"Item") == 0) && (xmlTextReaderDepth(reader) == depth) && (xmlTextReaderNodeType(reader) == 15) )
+  	{
+   	return;// Empty SQ
+   	}
+  SequenceOfItems *sqi;
+  
+  do  
+  	{
+  	PopulateDataSet(reader,DS);
+  	}while((strcmp(name,"Item") == 0) && (xmlTextReaderDepth(reader) == depth) && (xmlTextReaderNodeType(reader) == 15));
+  ret = xmlTextReaderRead(reader);
+  ret = xmlTextReaderRead(reader);	
 }
 
 void WriteDICOM(xmlTextReaderPtr reader, gdcm::Filename file2)
