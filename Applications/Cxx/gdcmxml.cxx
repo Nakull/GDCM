@@ -258,7 +258,7 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
  				LoadValueInteger(VR::SL);
     		LoadValueInteger(VR::US);
     		LoadValueFloat(VR::FL);
-    		//LoadValueFloat(VR::FD);
+    		LoadValueDouble(VR::FD);
 		  	};
 		  
 		  /*Modify de to insert*/
