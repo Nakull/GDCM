@@ -89,7 +89,7 @@ void PrintHelp()
 
 #ifdef GDCM_USE_SYSTEM_LIBXML2
 
-void HandleSequence(xmlTextReaderPtr reader,DataSet &DS,int depth);
+void HandleSequence(SequenceOfItems &sqi,xmlTextReaderPtr reader,DataSet &DS,int depth);
 void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS, int depth, bool SetSQ )
 {		
 	 int ret;	
@@ -262,7 +262,9 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS, int depth, bool SetSQ 
     		LoadValueDouble(VR::FD);
     		case VR::SQ:
     			{
-    			HandleSequence(reader,DS,xmlTextReaderDepth(reader));
+    			SequenceOfItems sqi;
+    			HandleSequence(sqi,reader,DS,xmlTextReaderDepth(reader));
+    			de.SetValue(sqi);
     			}break;
     			
     		default:
@@ -299,7 +301,7 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS, int depth, bool SetSQ 
    	}
 }
 
-void HandleSequence(xmlTextReaderPtr reader,DataSet &DS,int depth)
+void HandleSequence(SequenceOfItems &sqi, xmlTextReaderPtr reader,DataSet &DS,int depth)
 {
 	int ret;	
   const char *name = (const char*)xmlTextReaderConstName(reader);// Should be item
@@ -312,8 +314,7 @@ void HandleSequence(xmlTextReaderPtr reader,DataSet &DS,int depth)
   	ret = xmlTextReaderRead(reader);ret = xmlTextReaderRead(reader);ret = xmlTextReaderRead(reader);
   	name = (const char*)xmlTextReaderConstName(reader);
    	return;// Empty SQ
-   	}*/
-  SequenceOfItems sqi;
+   	}*/  
   
   do  
   	{
