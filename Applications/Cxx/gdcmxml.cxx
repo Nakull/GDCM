@@ -318,14 +318,14 @@ void HandleSequence(xmlTextReaderPtr reader,DataSet &DS,int depth)
   do  
   	{
   	Item item;
-  	DataSet DS;
-  	PopulateDataSet(reader,DS,depth,true);
-  	item.SetNestedDataSet(DS);
+  	DataSet NestedDS;
+  	PopulateDataSet(reader,NestedDS,depth,true);
+  	item.SetNestedDataSet(NestedDS);
   	sqi.AddItem(item);
   	ret = xmlTextReaderRead(reader);
   	ret = xmlTextReaderRead(reader);
   	name = (const char*)xmlTextReaderConstName(reader);
-  	}while((strcmp(name,"Item") == 0) && (xmlTextReaderDepth(reader) == depth));
+  	}while(!(strcmp(name,"Item") == 0) && (xmlTextReaderDepth(reader) == depth));
   ret = xmlTextReaderRead(reader);
   ret = xmlTextReaderRead(reader);	
 }
