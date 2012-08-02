@@ -242,9 +242,9 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
 		  	LoadValueASCII(VR::AS);
 				LoadValueASCII(VR::CS);
 				LoadValueASCII(VR::DA);
-				//LoadValue(VR::DS); Check whats wrong
+				LoadValueFloat(VR::DS); //Check whats wrong
 				LoadValueASCII(VR::DT);
-				//LoadValue(VR::IS); Check whats wrong
+				LoadValueInteger(VR::IS); //Check whats wrong
 				LoadValueASCII(VR::LO);
 				LoadValueASCII(VR::LT);
 				//LoadValue(VR::PN); TO DO
