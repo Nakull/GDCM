@@ -168,7 +168,7 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
     			{ \
     			ret = xmlTextReaderRead(reader); \
     			char *value_char = (char*)xmlTextReaderConstValue(reader); \
-    			sscanf(value_char,"%lf",&(values[count++]));  \
+    			sscanf(value_char,"%f",&(values[count++]));  \
     			ret = xmlTextReaderRead(reader);/*Value ending tag*/ \
     			name = (const char*)xmlTextReaderConstName(reader); \
     			ret = xmlTextReaderRead(reader);ret = xmlTextReaderRead(reader); \
@@ -225,10 +225,12 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
 				LoadValueASCII(VR::TM);
 				LoadValueASCII(VR::UI);
 				LoadValueASCII(VR::UT);
-				LoadValueInteger(VR::SS);				
+				LoadValueInteger(VR::SS);
     		LoadValueInteger(VR::UL);
- 				LoadValueInteger(VR::SL);   	
-    		LoadValueInteger(VR::US);    		
+ 				LoadValueInteger(VR::SL);
+    		LoadValueInteger(VR::US);
+    		LoadValueFloat(VR::FL);
+    		//LoadValueFloat(VR::FD);
 		  	};
 		  
 		  /*Modify de to insert*/
