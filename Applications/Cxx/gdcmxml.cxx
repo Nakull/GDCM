@@ -97,7 +97,7 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
    const char *name = (const char*)xmlTextReaderConstName(reader);
 	 //printf("%s\n",name);				
 
-#define LoadValue(type) \
+#define LoadValueASCII(type) \
   case type: \
     		{ \
       	int count =0; \
@@ -125,6 +125,38 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
     			} \
     		de = el.GetAsDataElement(); \
     		}break
+
+#define LoadValueASCII(type) \
+  case type: \
+    		{ \
+      	int count =0; \
+      	name = (const char*)xmlTextReaderConstName(reader); \
+      	if(strcmp(name,"DicomAttribute") == 0 && xmlTextReaderNodeType(reader) == 15)\
+      		break;\
+      	int values[10]; \
+      	Element<type,VM::VM1_n> el; \
+    		while(strcmp(name,"Value") == 0) \
+    			{ \
+    			ret = xmlTextReaderRead(reader); \
+    			char *value = (char*)xmlTextReaderConstValue(reader); \
+    			sscanf(value_char,"%d",&(values[count++]));  \
+    			ret = xmlTextReaderRead(reader);/*Value ending tag*/ \
+    			name = (const char*)xmlTextReaderConstName(reader); \
+    			ret = xmlTextReaderRead(reader);ret = xmlTextReaderRead(reader); \
+    			name = (const char*)xmlTextReaderConstName(reader); \
+    			} \
+    		el.SetLength( (count) * vr.GetSizeof() ); \
+    		int total = 0; \
+    		while(total < count) \
+    			{ \
+    			el.SetValue(values[total],total); \
+    			total++; \
+    			} \
+    		de = el.GetAsDataElement(); \
+    		}break
+
+
+    		
           
    while(xmlTextReaderDepth(reader) != 0)
 		{
@@ -150,21 +182,21 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
 		  /* Load Value */
 		  switch(vr)
 		  	{
-		  	LoadValue(VR::AE);
-		  	LoadValue(VR::AS);
-				LoadValue(VR::CS);
-				LoadValue(VR::DA);
+		  	LoadValueASCII(VR::AE);
+		  	LoadValueASCII(VR::AS);
+				LoadValueASCII(VR::CS);
+				LoadValueASCII(VR::DA);
 				//LoadValue(VR::DS); Check whats wrong
-				LoadValue(VR::DT);
+				LoadValueASCII(VR::DT);
 				//LoadValue(VR::IS); Check whats wrong
-				LoadValue(VR::LO);
-				LoadValue(VR::LT);
+				LoadValueASCII(VR::LO);
+				LoadValueASCII(VR::LT);
 				//LoadValue(VR::PN); TO DO
-				LoadValue(VR::SH);
-				LoadValue(VR::ST);
-				LoadValue(VR::TM);
-				LoadValue(VR::UI);
-				LoadValue(VR::UT);
+				LoadValueASCII(VR::SH);
+				LoadValueASCII(VR::ST);
+				LoadValueASCII(VR::TM);
+				LoadValueASCII(VR::UI);
+				LoadValueASCII(VR::UT);
 				//LoadValue(VR::SS);
 				/*
 		  	case VR::CS: 
