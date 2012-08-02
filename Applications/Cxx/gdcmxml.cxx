@@ -215,7 +215,7 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS, int depth, bool SetSQ 
     		}break
     		
           
-   while(xmlTextReaderDepth(reader) != 0 || (SetSQ && xmlTextReaderDepth(reader) == depth))
+   while(  (xmlTextReaderDepth(reader)!=0) && !(SetSQ && (xmlTextReaderDepth(reader)==depth) && (strcmp(name,"Item")==0)  )  )
 		{
    	if(strcmp(name,"DicomAttribute") == 0)
 			{
@@ -262,7 +262,7 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS, int depth, bool SetSQ 
     		LoadValueDouble(VR::FD);
     		case VR::SQ:
     			{
-    			HandleSequence(reader,DS,0);
+    			HandleSequence(reader,DS,xmlTextReaderDepth(reader));
     			}break;
     			
     		default:
@@ -306,10 +306,13 @@ void HandleSequence(xmlTextReaderPtr reader,DataSet &DS,int depth)
     
   ret = xmlTextReaderRead(reader);
   ret = xmlTextReaderRead(reader);//at /Dicom
-  if((strcmp(name,"Item") == 0) && (xmlTextReaderDepth(reader) == depth) && (xmlTextReaderNodeType(reader) == 15) )
+  name = (const char*)xmlTextReaderConstName(reader);
+  /*if((strcmp(name,"Item") == 0) && (xmlTextReaderDepth(reader) == depth) && (xmlTextReaderNodeType(reader) == 15) )
   	{
+  	ret = xmlTextReaderRead(reader);ret = xmlTextReaderRead(reader);ret = xmlTextReaderRead(reader);
+  	name = (const char*)xmlTextReaderConstName(reader);
    	return;// Empty SQ
-   	}
+   	}*/
   SequenceOfItems sqi;
   
   do  
@@ -321,9 +324,10 @@ void HandleSequence(xmlTextReaderPtr reader,DataSet &DS,int depth)
   	sqi.AddItem(item);
   	ret = xmlTextReaderRead(reader);
   	ret = xmlTextReaderRead(reader);
+  	name = (const char*)xmlTextReaderConstName(reader);
   	}while((strcmp(name,"Item") == 0) && (xmlTextReaderDepth(reader) == depth));
-  //ret = xmlTextReaderRead(reader);
-  //ret = xmlTextReaderRead(reader);	
+  ret = xmlTextReaderRead(reader);
+  ret = xmlTextReaderRead(reader);	
 }
 
 void WriteDICOM(xmlTextReaderPtr reader, gdcm::Filename file2)
