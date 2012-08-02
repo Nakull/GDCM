@@ -89,6 +89,10 @@ void PrintHelp()
 
 #ifdef GDCM_USE_SYSTEM_LIBXML2
 
+void HandleSequence(xmlTextReaderPtr reader,DataSet &DS,int depth)
+	{
+	return;
+	}
 void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
 {		
 	 int ret;	
@@ -259,6 +263,13 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
     		LoadValueInteger(VR::US);
     		LoadValueFloat(VR::FL);
     		LoadValueDouble(VR::FD);
+    		case VR::SQ:
+    			{
+    			HandleSequence(reader,DS,0);
+    			}break;
+    			
+    		default:
+    			assert(0 && "Unknown VR");	
 		  	};
 		  
 		  /*Modify de to insert*/
