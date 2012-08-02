@@ -90,7 +90,7 @@ void PrintHelp()
 #ifdef GDCM_USE_SYSTEM_LIBXML2
 
 void HandleSequence(xmlTextReaderPtr reader,DataSet &DS,int depth);
-void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS)
+void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS, int depth, bool SetSQ )
 {		
 	 int ret;	
    //int ret = xmlTextReaderRead(reader);/**/
@@ -333,7 +333,7 @@ void WriteDICOM(xmlTextReaderPtr reader, gdcm::Filename file2)
 	
 	DataSet DS;
 	if(xmlTextReaderDepth(reader) == 1 && strcmp((const char*)xmlTextReaderConstName(reader),"DicomAttribute") == 0)  
-  	PopulateDataSet(reader,DS);
+  	PopulateDataSet(reader,DS,1,false);
   
   //add to File 
   File F;
