@@ -88,7 +88,9 @@ void PrintHelp()
 }
 
 #ifdef GDCM_USE_SYSTEM_LIBXML2
-
+void HandlePN()
+	{
+	}
 void HandleSequence(SequenceOfItems &sqi,xmlTextReaderPtr reader,DataSet &DS,int depth);
 void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS, int depth, bool SetSQ )
 {		
@@ -243,12 +245,11 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS, int depth, bool SetSQ 
 		  	LoadValueASCII(VR::AS);
 				LoadValueASCII(VR::CS);
 				LoadValueASCII(VR::DA);
-				LoadValueFloat(VR::DS); //Check whats wrong
+				LoadValueFloat(VR::DS);
 				LoadValueASCII(VR::DT);
-				LoadValueInteger(VR::IS); //Check whats wrong
+				LoadValueInteger(VR::IS);
 				LoadValueASCII(VR::LO);
-				LoadValueASCII(VR::LT);
-				//LoadValue(VR::PN); TO DO
+				LoadValueASCII(VR::LT);				
 				LoadValueASCII(VR::SH);
 				LoadValueASCII(VR::ST);
 				LoadValueASCII(VR::TM);
@@ -266,6 +267,11 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS, int depth, bool SetSQ 
     			HandleSequence(sqi,reader,DS,xmlTextReaderDepth(reader));
     			de.SetValue(sqi);
     			}break;
+    		
+    		case VR::PN:
+    			{
+    			HandlePN();
+    			}break;	
     			
     		default:
     			assert(0 && "Unknown VR");	
