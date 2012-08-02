@@ -215,7 +215,7 @@ void PopulateDataSet(xmlTextReaderPtr reader,DataSet &DS, int depth, bool SetSQ 
     		}break
     		
           
-   while(xmlTextReaderDepth(reader) != 0)
+   while(xmlTextReaderDepth(reader) != 0 || (SetSQ && xmlTextReaderDepth(reader) == depth))
 		{
    	if(strcmp(name,"DicomAttribute") == 0)
 			{
@@ -310,14 +310,20 @@ void HandleSequence(xmlTextReaderPtr reader,DataSet &DS,int depth)
   	{
    	return;// Empty SQ
    	}
-  SequenceOfItems *sqi;
+  SequenceOfItems sqi;
   
   do  
   	{
-  	PopulateDataSet(reader,DS);
-  	}while((strcmp(name,"Item") == 0) && (xmlTextReaderDepth(reader) == depth) && (xmlTextReaderNodeType(reader) == 15));
-  ret = xmlTextReaderRead(reader);
-  ret = xmlTextReaderRead(reader);	
+  	Item item;
+  	DataSet DS;
+  	PopulateDataSet(reader,DS,depth,true);
+  	item.SetNestedDataSet(DS);
+  	sqi.AddItem(item);
+  	ret = xmlTextReaderRead(reader);
+  	ret = xmlTextReaderRead(reader);
+  	}while((strcmp(name,"Item") == 0) && (xmlTextReaderDepth(reader) == depth));
+  //ret = xmlTextReaderRead(reader);
+  //ret = xmlTextReaderRead(reader);	
 }
 
 void WriteDICOM(xmlTextReaderPtr reader, gdcm::Filename file2)
