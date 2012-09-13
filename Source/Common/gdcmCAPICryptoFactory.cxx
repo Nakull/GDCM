@@ -11,8 +11,6 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-//#pragma comment(lib, "Crypt32.lib")
-
 #include "gdcmCAPICryptoFactory.h"
 #include "gdcmCAPICryptographicMessageSyntax.h"
 
@@ -27,7 +25,7 @@ CAPICryptoFactory::CAPICryptoFactory(CryptoLib id) : CryptoFactory(id)
 CryptographicMessageSyntax* CAPICryptoFactory::CreateCMSProvider()
 {
   CAPICryptographicMessageSyntax* capicms = new CAPICryptographicMessageSyntax();
-  if (!capicms->getInitialized())
+  if (!capicms->GetInitialized())
     {
     delete capicms;
     return NULL;

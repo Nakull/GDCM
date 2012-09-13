@@ -11,7 +11,6 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-
 #ifndef GDCMCAPICRYPTOGRAPHICMESSAGESYNTAX_H
 #define GDCMCAPICRYPTOGRAPHICMESSAGESYNTAX_H
 
@@ -22,6 +21,7 @@
 
 namespace gdcm
 {
+
 class GDCM_EXPORT CAPICryptographicMessageSyntax : public CryptographicMessageSyntax
 {
 public:
@@ -33,11 +33,7 @@ public:
   bool ParseKeyFile( const char *filename );
 
   // PBE
-  bool SetPassword(const char * pass, size_t passLen)
-  {
-    gdcmWarningMacro( "CAPI does not support Password Based Encryption." );
-    return false;
-  }
+  bool SetPassword(const char * pass, size_t passLen);
 
   void SetCipherType(CipherTypes type);
 
@@ -48,15 +44,15 @@ public:
   /// decrypt content from a CMS envelopedData structure
   bool Decrypt(char *output, size_t &outlen, const char *array, size_t len) const;
 
-  bool getInitialized()
+  bool GetInitialized() const
   {
     return initialized;
   }
 
 private:
   bool Initialize();
-  static ALG_ID getAlgIdByObjId(const char * pszObjId);
-  LPSTR getCipherObjId() const;
+  static ALG_ID GetAlgIdByObjId(const char * pszObjId);
+  const char *GetCipherObjId() const;
   static void ReverseBytes(BYTE* data, DWORD len);
   static bool LoadFile(const char * filename, BYTE* & buffer, DWORD & bufLen);
 
@@ -66,7 +62,6 @@ private:
   std::vector<PCCERT_CONTEXT> certifList;
   HCRYPTKEY hRsaPrivK;
   CipherTypes cipherType;
-
 };
 
 } // end namespace gdcm

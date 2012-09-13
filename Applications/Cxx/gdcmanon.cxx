@@ -316,6 +316,7 @@ int main(int argc, char *argv[])
   std::vector< std::pair<gdcm::Tag, std::string> > replace_tags_value;
   gdcm::Tag tag;
   gdcm::CryptoFactory::CryptoLib crypto_lib;
+  crypto_lib = gdcm::CryptoFactory::DEFAULT;
 
   while (1) {
     //int this_option_optind = optind ? optind : 1;
@@ -604,18 +605,10 @@ int main(int argc, char *argv[])
     return 1;
     }
 
-  if (crypto_api == 0)
-    {
-#ifdef WIN32
-  crypto_lib = gdcm::CryptoFactory::CAPI;
-#else
-  crypto_lib = gdcm::CryptoFactory::OPENSSL;
-#endif
-    }
   gdcm::CryptoFactory* crypto_factory = NULL;
   if( deidentify || reidentify )
     {
-    crypto_factory = gdcm::CryptoFactory::getFactoryInstance(crypto_lib);
+    crypto_factory = gdcm::CryptoFactory::GetFactoryInstance(crypto_lib);
     if (!crypto_factory)
       {
       std::cerr << "Requested cryptoraphic library not configured." << std::endl;
@@ -780,26 +773,31 @@ int main(int argc, char *argv[])
     }
 
   // Get private key/certificate
-  std::auto_ptr<gdcm::CryptographicMessageSyntax> cms_ptr(crypto_factory->CreateCMSProvider());
-  gdcm::CryptographicMessageSyntax& cms = *cms_ptr;
+  std::auto_ptr<gdcm::CryptographicMessageSyntax> cms_ptr;
+  if( crypto_factory )
+    {
+    cms_ptr = std::auto_ptr<gdcm::CryptographicMessageSyntax>(crypto_factory->CreateCMSProvider());
+    }
   if( !dumb_mode )
     {
-    if( !GetRSAKeys(cms, rsa_path.c_str(), cert_path.c_str() ) )
+    if( !GetRSAKeys(*cms_ptr, rsa_path.c_str(), cert_path.c_str() ) )
       {
       return 1;
       }
-    if (!password.empty() && !cms.SetPassword(password.c_str(), password.length()) )
+    if (!password.empty() && !cms_ptr->SetPassword(password.c_str(), password.length()) )
       {
       std::cerr << "Could not set the password " << std::endl;
       return 1;
       }
-    cms.SetCipherType( ciphertype );
+    cms_ptr->SetCipherType( ciphertype );
     }
 
   // Setup gdcm::Anonymizer
   gdcm::Anonymizer anon;
   if( !dumb_mode )
-    anon.SetCryptographicMessageSyntax( &cms );
+    {
+    anon.SetCryptographicMessageSyntax( cms_ptr.get() );
+    }
 
   if( dumb_mode )
     {
